@@ -16,7 +16,7 @@ const app = express();
 
 // Middleware - CORS Configuration
 const allowedOrigins = process.env.NODE_ENV === 'production'
-  ? [process.env.CORS_ORIGIN]
+  ? (process.env.CORS_ORIGIN ? [process.env.CORS_ORIGIN] : ['https://perpustakaan-frontend-production.up.railway.app'])
   : ['http://localhost:5500', 'http://localhost:3000', 'http://127.0.0.1:5500', 'http://127.0.0.1:3000'];
 
 app.use(cors({
