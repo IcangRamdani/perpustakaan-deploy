@@ -2,6 +2,15 @@ function toggleMenu(){
   document.getElementById("menu").classList.toggle("show");
 }
 
+// Detect if running in Railway production or local development
+const isProduction = window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1';
+const API_BASE_URL = isProduction 
+  ? 'https://perpustakaan-deploy-production.up.railway.app/api'
+  : 'http://localhost:3000/api';
+
+console.log(`🌐 Environment: ${isProduction ? 'PRODUCTION' : 'DEVELOPMENT'}`);
+console.log(`📡 API URL: ${API_BASE_URL}`);
+
 async function register(){
   const user={
     nama:regNama.value,
@@ -16,7 +25,7 @@ async function register(){
   }
 
   try {
-    const response = await fetch('http://localhost:3000/api/user/register', {
+    const response = await fetch(API_BASE_URL + '/user/register', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(user)
@@ -30,7 +39,7 @@ async function register(){
     }
 
     alert("Pendaftaran berhasil!");
-    location.href="index.html";
+    location.href="perpustakaan-frontend/index.html";
   } catch (error) {
     console.error("Register error:", error);
     alert("Error: " + error.message);
@@ -42,7 +51,7 @@ async function login(){
   const p=password.value;
 
   try {
-    const response = await fetch('http://localhost:3000/api/user/login', {
+    const response = await fetch(API_BASE_URL + '/user/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ username: u, password: p })
@@ -60,7 +69,7 @@ async function login(){
     localStorage.setItem("user_id", user.id);
     localStorage.setItem("username", user.username);
     localStorage.setItem("nama", user.nama);
-    location.href="dashboard.html";
+    location.href="perpustakaan-frontend/dashboard.html";
   } catch (error) {
     console.error("Login error:", error);
     alert("Error: " + error.message);
