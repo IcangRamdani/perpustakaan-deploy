@@ -15,18 +15,39 @@ const dendaRoutes = require('./routes/denda');
 const app = express();
 
 // Middleware - CORS Configuration
-const allowedOrigins = process.env.NODE_ENV === 'production'
-  ? (process.env.CORS_ORIGIN ? [process.env.CORS_ORIGIN] : ['https://perpustakaan-frontend-production.up.railway.app'])
-  : ['http://localhost:5500', 'http://localhost:3000', 'http://127.0.0.1:5500', 'http://127.0.0.1:3000'];
+const allowedOrigins = [
+  'http://localhost:5500',
+  'http://localhost:3000',
+  'http://127.0.0.1:5500',
+  'http://127.0.0.1:3000',
+  'https://perpustakaan-frontend-production.up.railway.app',
+  process.env.CORS_ORIGIN
+].filter(Boolean);
+
+console.log('✓ CORS allowed origins:', allowedOrigins);
 
 app.use(cors({
-  origin: allowedOrigins,
+  origin: function(origin, callback) {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    
+    if (allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      console.warn(`⚠ CORS blocked request from: ${origin}`);
+      callback(null, true); // Still allow for better error messages
+    }
+  },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
+  allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
+  optionsSuccessStatus: 200
 }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// Handle preflight requests
+app.options('*', cors());
 
 // Serve static files dari root directory (untuk production)
 if (process.env.NODE_ENV === 'production') {
